@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>...: Calculadora Salário Líquido :...</title>
+     <link rel="icon" type="image/x-icon" href= "{{url_for('static', filename='favicon.ico') }}">
+     <style>
+        /* reset basico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        /* Cabeçalho */
+        header {
+            background:  #fff; /* Cor do cabeçalho do site */
+            color: #000000;
+            padding: 20px;
+            text-align: center;
+            margin: 100 auto;
+            font-family: 'Courier New', Courier, monospace;
+        }
+     .logo img{
+        border-radius: 50px;
+        padding-right: 50px;
+        width: 500px;
+        cursor: pointer;
+        margin-top: 20px;
+     }
+
+     nav {
+    position: fixed; /* Torna a nav fixa */
+    top: 0; 
+    left: 0; 
+    width: 100%; /* Largura total da tela */
+    background-color: #fff; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    z-index: 1000; /* Certifica-se de que a nav fique acima de outros elementos */
+}
+        /* Rodapé */
+        footer {
+            background: #1a1a1d; /* Azul escuro */
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        footer p {
+            margin: 10px 0; 
+        }
+
+        footer a {
+            color: #007bff; /* Azul */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Links */
+        a {
+            color: #007bff; /* Azul */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Layout */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .custom-font {
+            font-family: "Dancing Script", cursive;
+}
+        .content {
+            margin-bottom: 30px;
+        }
+     </style>
+</head>
+<body>
+    <header id="inicio">
+        <img src="../static/imagem/login.jpeg" alt="Logo da Empresa" class="logo"width="150" height="auto">
+        <h1>RH System Calculator</h1>
+    </header>
+  
+    <nav>
+        <a href="#inicio">Início</a>
+        <a href="#objetivo">Objetivo da Calculadora</a>
+        <a href="#calculo">Cálculo de Salário Líquido</a>
+        <a href="#tabelas">Tabelas Importantes</a>
+        <a href="#contato">Fale Conosco</a>
+    </nav>
+
+    <section id="boas-vindas">
+        <p>Bem-vindo ao sistema de folha de pagamento automatizado.</p>
+    </section>
+    <section id="objetivo">
+        <h2>Objetivo da Calculadora</h2>
+        <p>Este projeto tem como objetivo ser uma calculadora automatizada para ajudar empresas a fecharem a folha de pagamento dos funcionários de forma mais rápida e eficiente. <br> A folha de pagamento é um documento que contém informações sobre os <b>salários, horas extras, descontos</b>  e outros detalhes relacionados ao pagamento de cada colaborador. <br> No formato atual, o processo pode ser demorado e sujeito a erros. <br>
+         Com essa solução, queremos reduzir o tempo necessário para calcular os pagamentos e garantir que os valores sejam calculados corretamente, seguindo todas as regras trabalhistas. <br> Além disso, o sistema será capaz de gerar relatórios detalhados, facilitando ainda mais o trabalho da equipe de Recursos Humanos.</p>
+    </section>
+    <section id="calculo">
+     <h2>Cálculo de Salário Líquido</h2>
+     <p>Por favor, preencha os campos abaixo para realizar o cálculo do salário líquido do funcionário.<br>
+     As informações devem ser precisas para garantir resultados corretos.</p>
+     <form method="POST">
+        <label for="salario">Digite o salário:</label>
+        <input type="number" step="0.01" name="salario" required>
+        <br>
+        <label for="horas">Digite em horas trabalhadas:</label>
+        <input type="number" step="0.01" name="horas" required>
+        <br>
+        <label for="atraso">Digite horas de atrasos:</label>
+        <input type="number" step="0.01" name="atraso" required>
+        <br>
+        <label for="extras">Digite horas extras:</label>
+        <input type="number" step="0.01" name="extras" required>
+        <br>
+        <label for="taxa">Digite a taxa de 50% a 100%:</label>
+        <input type="number" name="taxa" min="50" max="100" required>
+        <br>
+        <label for="aliquota">Digite a alíquota do INSS:</label>
+        <input type="number" step="0.01" name="aliquota" required>
+        <br>
+        <label for="bonus">Digite bonificação:</label>
+        <input type="number" step="0.01" name="bonus" required>
+        <br>
+        <label>Possui vale alimentação ou refeição (VA/VR)? (s/n): </label>
+        <input type="text" name="resposta" required>
+        <br>
+        <div id="vavr-block" style="display:none;">
+            <label for="vavr">Digite o valor do benefício VA/VR:</label>
+            <input type="number" step="0.01" name="vavr">
+        </div>
+        <br>
+        <input type="submit" value="Calcular">
+     </form>
+     {% if resultado %}
+        <h2>Resultados:</h2>
+        <p>Valor da hora: R$ {{ resultado['valorhora'] | round(2) }}</p>
+        <p>Valor horas extras: R$ {{ resultado['valorhoraextra'] | round(2) }}</p>
+        <p>Desconto dos atrasos: -R$ {{ resultado['descontoatraso'] | round(2) }}</p>
+        <p>Desconto INSS: -R$ {{ resultado['dinss'] | round(2) }}</p>
+        <p>Desconto FGTS: -R$ {{ resultado['fgts'] | round(2) }}</p>
+        <p>Desconto VA/VR: -R$ {{ resultado['descontovavr'] | round(2) }}</p>
+        <h3>Líquido a receber: R$ {{ resultado['liquido'] | round(2) }}</h3>
+           {% endif %}
+     </section>
+     <script>
+        
+        // Script para mostrar o campo de valor VA/VR se a resposta for 's'
+        const respostaInput = document.querySelector('input[name="resposta"]');
+        const vavrBlock = document.getElementById('vavr-block');
+        respostaInput.addEventListener('input', function() {
+            vavrBlock.style.display = respostaInput.value.toLowerCase() === 's' ? 'block' : 'none';
+        });
+     </script>
+     <div id="txt_cest">
+     <h2>Tabelas Importantes:</h2>
+     <section id="tabelas">
+
+     <p style="color: #200168;">- Tabela IRRF:</p>
+     <table border="1" bordercolor="#666" cellspacing="1" style="border-collapse: collapse; margin:auto;" width="85%">
+            <tbody>
+                <tr bgcolor="#CAFBE3">
+                    <td bgcolor="#EAF4FF" style="background-color: rgb(204, 204, 204);" valign="MIDDLE" width="23%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;"><strong>Base de Cálculo (R$)</strong></span></p>
+                    </td>
+                    <td bgcolor="#EAF4FF" style="background-color: rgb(204, 204, 204);" valign="MIDDLE" width="22%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><strong><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Alíquota (%)</span></strong></p>
+                    </td>
+                    <td bgcolor="#EAF4FF" style="background-color: rgb(204, 204, 204);" valign="MIDDLE" width="16%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: 'Serifa BT', 'Georgia Ref';"><strong><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Parcela a Deduzir do IR (R$)</span></strong></span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">De 2.259,21 até 2.826,65</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">7,5%</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="16%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">169,44</span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">De 2.826,66 até 3.751,05</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">15%</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="16%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">381,44</span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">De 3.751,06 até 4.664,68</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">22,5%</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="16%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">662,77</span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Acima de 4.664,68</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">27,5%</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="16%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">896,00</span></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Dependentes: R$ 189,59</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Desconto simplificado: R$ 564,80</span></p>
+                    </td>
+                    <td bgcolor="#ffffff" valign="MIDDLE" width="16%">
+                    <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">-</span></p>
+                    </td>
+                    </tr>
+                </tbody>
+              </table>
+
+     <p style="color: #200168;">- Tabela INSS:</p>
+     <table border="1" bordercolor="#666" cellspacing="1" style="border-collapse: collapse; margin:auto;" width="85%">
+        <tbody>
+            <tr bgcolor="#CAFBE3">
+                <td bgcolor="#EAF4FF" style="background-color: rgb(204, 204, 204);" valign="MIDDLE" width="23%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;"><strong>Base de Cálculo (R$)</strong></span></p>
+                </td>
+                <td bgcolor="#EAF4FF" style="background-color: rgb(204, 204, 204);" valign="MIDDLE" width="22%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><strong><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Alíquota (%)</span></strong></p>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">até R$ 1.412,00</span></p>
+                </td>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">7,5%</span></p>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">de R$ 1.412,01 até R$ 2.666,68</span></p>
+                </td>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">9%</span></p>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">de R$ 2.666,69 até R$ 4.000,03 </span></p>
+                </td>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">12%</span></p>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="23%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">de R$ 4.000,04 até R$ 7.786,02</span></p>
+                </td>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="22%">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">14%</span></p>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="23%" colspan="2">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Teto Máximo de Desconto do Empregado= R$ 908,85
+                </span></p>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="#ffffff" valign="MIDDLE" width="23%" colspan="2">
+                <p align="CENTER" style="margin-top: 0px; margin-bottom: 0px;"><span style="font-family: Arial, Helvetica, sans-serif; font-size: 10pt;">Teto Máximo de Desconto do Contribuinte Individual= R$ 856,46
+                </span></p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </section>
+    </div>
+    <footer>
+        <p>&copy; 2024 RH System Calculator. Todos os direitos reservados.</p>
+    <section id="contato">
+    <h2>Contato:</h2>
+    <p>Email: contato@empresa.com</p>
+    <p>Telefone: (11) 1234-5678</p>
+    <p>Endereço: Rua Exemplo, 123 - Cidade, Estado</p>
+      <p>Siga-nos nas redes sociais:
+            <a href="https://www.linkedin.com" target="_blank" rel="external">Linkedin</a> |
+            <a href="https://www.x.com" target="_blank" rel="external">X</a> |
+            <a href="https://www.facebook.com/" target="_blank" rel="external">Facebook</a>
+        </p>
+    </section>
+    <p>O site RH System Calculator é um serviço gratuito que tem caráter meramente informativo e não substitui ou dispensa a consulta a um profissional especializado. O usuário que utiliza os nossos serviços o faz por sua conta e risco, e aceita que não temos qualquer responsabilidade por danos de qualquer natureza resultantes desta utilização.</p>
+    <p>As informações e conteúdos deste site originam-se de fontes confiáveis, porém RH System Calculator não garante e nem se responsabiliza por sua precisão e confiabilidade, e seu uso para qualquer propósito específico, assim como por lucros cessantes, reclamações de terceiros e danos diretos e indiretos causados por usos das mesmas.</p>
+
+    </footer>
+</body>
+</html>
